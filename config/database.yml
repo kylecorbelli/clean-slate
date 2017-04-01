@@ -12,21 +12,21 @@
 default: &default
   adapter: mysql2
   encoding: utf8
-  pool: 5
+  pool: 10
   username: root
   password:
   host: localhost
 
 development:
   <<: *default
-  database: clean-slate_development
+  database: clean_slate_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: clean-slate_test
+  database: clean_slate_test
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -49,6 +49,8 @@ test:
 #
 production:
   <<: *default
-  database: clean-slate_production
-  username: clean-slate
-  password: <%= ENV['CLEAN-SLATE_DATABASE_PASSWORD'] %>
+  adapter: postgresql
+  encoding: unicode
+  url: <%= ENV['DATABASE_URL'] %>
+  database: clean_slate_production
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 10 } %>
