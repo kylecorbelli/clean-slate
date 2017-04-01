@@ -10,6 +10,9 @@ end
 gem 'rails', '~> 5.0.2'
 # Use Puma as the app server
 gem 'puma', '~> 3.0'
+# Devise Token auth for authentication https://github.com/lynndylanhurley/devise_token_auth:
+gem 'devise_token_auth'
+gem 'omniauth'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.5'
 # Use Redis adapter to run Action Cable in production
