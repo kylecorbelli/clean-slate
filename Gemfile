@@ -19,7 +19,6 @@ gem 'omniauth'
 # gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
-
 # GraphQL for that sweet cutting edge:
 gem 'graphql'
 
@@ -34,6 +33,11 @@ group :development, :test do
   # Use mysql as the database for Active Record
   gem 'mysql2', '>= 0.3.18', '< 0.5'
   gem 'byebug', platform: :mri
+  # Rspec for that baller testing:
+  gem 'rspec-rails', '~> 3.5'
+  gem 'rspec-collection_matchers'
+  # Pry to get in there and tinker:
+  gem 'pry'
 end
 
 group :development do
