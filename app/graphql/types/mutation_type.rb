@@ -41,12 +41,8 @@ Types::MutationType = GraphQL::ObjectType.define do
     argument :id, !types.ID
     argument :taskInput, !Types::TaskInputType
     resolve ->(obj, args, ctx) {
-      key_val_array = args[:taskInput].to_h.map do |key, val|
-        [key.underscore, val]
-      end
-      update_hash = Hash[key_val_array]
       task = Task.find(args[:id])
-      task.update! update_hash
+      task.update! args[:taskInput].to_h.deep_underscore_keys
       task
     }
   end
