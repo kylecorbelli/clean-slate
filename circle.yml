@@ -5,8 +5,6 @@ database:
 deployment:
   production:
     branch: master
-    heroku:
-      appname: blueberry-pudding-19740
     commands:
       - git push git@heroku.com:blueberry-pudding-19740.git $CIRCLE_SHA1:refs/heads/master
       - heroku run bundle install --app blueberry-pudding-19740
