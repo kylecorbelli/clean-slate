@@ -9,7 +9,7 @@ describe 'Task API' do
     task_to_edit.save!
     new_description = 'This is the new task description !@#$%^&*()'
     operation_name = 'EditTask'
-    query = %Q(
+    query = %(
       mutation #{operation_name}($id: ID!, $taskInput: TaskInput!) {
         editTask(id: $id, taskInput: $taskInput) {
           id
