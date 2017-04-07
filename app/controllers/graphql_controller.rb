@@ -1,10 +1,13 @@
 class GraphqlController < ApplicationController
+  before_action :authenticate_user!
+
   def execute
     variables = ensure_hash(params[:variables])
     query = params[:query]
     context = {
       # Query context goes here, for example:
-      # current_user: current_user,
+      current_user: current_user,
+      authenticate_user!: method(:authenticate_user!)
     }
     result = CleanSlateSchema.execute(
       query,

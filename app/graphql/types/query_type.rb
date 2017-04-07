@@ -3,7 +3,7 @@ Types::QueryType = GraphQL::ObjectType.define do
 
   field :lists, types[Types::ListType] do
     description 'All the lists'
-    resolve ->(_, _, _) { List.all }
+    resolve ->(_, _, context) { context[:current_user].lists.all }
   end
 
   field :list, Types::ListType do

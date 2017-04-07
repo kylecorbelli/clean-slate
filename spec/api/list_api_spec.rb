@@ -3,7 +3,7 @@ require 'clean_slate_spec_helper'
 describe 'List API' do
   include_context 'mocked data'
 
-  it 'should be able to query all lists' do
+  it 'should be able to query all lists for the current user' do
     query_string = %(
       query {
         lists {
@@ -15,7 +15,7 @@ describe 'List API' do
       query: query_string,
       variables: nil
     }
-    post '/graphql', params: request_body.to_json, headers: headers
+    post '/graphql', params: request_body.to_json, headers: auth_headers
     response_body = JSON.parse(response.body)
     lists = response_body['data']['lists']
 
