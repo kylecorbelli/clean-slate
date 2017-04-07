@@ -4,7 +4,7 @@ describe 'List API' do
   include_context 'mocked data'
 
   it 'should be able to query all lists' do
-    query_string = %q(
+    query_string = %(
       query {
         lists {
           title
@@ -15,7 +15,7 @@ describe 'List API' do
       query: query_string,
       variables: nil
     }
-    post '/graphql', params: request_body
+    post '/graphql', params: request_body.to_json, headers: headers
     response_body = JSON.parse(response.body)
     lists = response_body['data']['lists']
 

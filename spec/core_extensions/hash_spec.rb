@@ -2,7 +2,8 @@ require 'rails_helper'
 
 describe Hash do
   let :hash do
-    # We have keys of both String and Symbol types since they both should be underscored:
+    # We have keys of both String and Symbol types since they
+    # both should be underscored:
     {
       theTask: {
         description: 'underscore all keys',
