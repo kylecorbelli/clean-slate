@@ -50,6 +50,10 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
 
+group :test do
+  gem 'codecov', :require => false
+end
+
 group :production do
   # Use postgres as the database for Active Record
   gem 'pg'

@@ -1,4 +1,9 @@
 require 'rails_helper'
+require 'simplecov'
+require 'codecov'
+
+SimpleCov.start
+SimpleCov.formatter = SimpleCov::Formatter::Codecov
 
 shared_context 'mocked data' do
   let! :headers do
