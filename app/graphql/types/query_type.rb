@@ -1,9 +1,4 @@
-# TODO: extract this to a helper file:
-def owned_resource(ctx)
-  current_user = ctx[:current_user]
-  return yield(current_user) if current_user
-  GraphQL::ExecutionError.new('Authorized users only.')
-end
+require_relative '../../helpers/graphql_helpers'
 
 Types::QueryType = GraphQL::ObjectType.define do
   name 'Query'

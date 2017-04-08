@@ -4,8 +4,7 @@ class GraphqlController < ApplicationController
     query = params[:query]
     context = {
       # Query context goes here, for example:
-      current_user: current_user,
-      authenticate_user!: method(:authenticate_user!)
+      current_user: current_user
     }
     result = CleanSlateSchema.execute(
       query,
