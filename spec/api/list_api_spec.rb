@@ -3,25 +3,190 @@ require 'clean_slate_spec_helper'
 describe 'List API' do
   include_context 'mocked data'
 
-  it 'should be able to query all lists' do
-    query_string = %(
+  let :lists_request_body do
+    query = %(
       query {
         lists {
           title
         }
       }
     )
-    request_body = {
-      query: query_string,
+    {
+      query: query,
       variables: nil
     }
-    post '/graphql', params: request_body.to_json, headers: headers
+  end
+
+  let :list_request_body do
+    query = %(
+      query List($id: ID!){
+        list(id: $id) {
+          title
+        }
+      }
+    )
+    {
+      query: query,
+      variables: {
+        id: list_one.id
+      }
+    }
+  end
+
+  let :create_list_request_body do
+    query = %(
+      mutation CreateList($title: String!) {
+        createList(title: $title) {
+          title
+        }
+      }
+    )
+    {
+      query: query,
+      variables: {
+        title: 'Some cool new list of things to do'
+      }
+    }
+  end
+
+  let :edit_list_request_body do
+    query = %(
+      mutation EditList($id: ID!, $listInput: ListInput!) {
+        editList(id: $id, listInput: $listInput) {
+          title
+        }
+      }
+    )
+    {
+      query: query,
+      variables: {
+        id: list_one.id,
+        listInput: {
+          title: 'This should be a totally new title'
+        }
+      }
+    }
+  end
+
+  let :delete_list_request_body do
+    query = %(
+      mutation DeleteList($id: ID!) {
+        deleteList(id: $id) {
+          title
+        }
+      }
+    )
+    {
+      query: query,
+      variables: {
+        id: list_one.id
+      }
+    }
+  end
+
+  # TODO: Extract this into a helper file:
+  def expect_unauthorized_error(response)
     response_body = JSON.parse(response.body)
-    lists = response_body['data']['lists']
+    error_message = response_body['errors'][0]['message']
+    expect(error_message).to eq('Authorized users only.')
+  end
 
-    expect(lists).to have(2).lists
+  context 'when a user is not logged in' do
+    it 'should not allowing querying of lists' do
+      post '/graphql', params: lists_request_body.to_json, headers: headers
+      expect_unauthorized_error response
+    end
 
-    list_title = lists[0]['title']
-    expect(list_title).to eq(list_one.title)
+    it 'should not allow querying of a single list' do
+      post '/graphql', params: list_request_body.to_json, headers: headers
+      expect_unauthorized_error response
+    end
+
+    it 'should not allow the creation of a list' do
+      post '/graphql', params: create_list_request_body.to_json,
+                       headers: headers
+      expect_unauthorized_error response
+    end
+
+    it 'should not allow the editing of a list' do
+      post '/graphql', params: edit_list_request_body.to_json, headers: headers
+      expect_unauthorized_error response
+    end
+
+    it 'should not allow the deleting of a list' do
+      post '/graphql', params: delete_list_request_body.to_json,
+                       headers: headers
+      expect_unauthorized_error response
+    end
+  end
+
+  context 'when a user is logged in' do
+    it 'should be able to query all lists for the current user' do
+      post '/graphql', params: lists_request_body.to_json, headers: auth_headers
+      response_body = JSON.parse(response.body)
+      lists = response_body['data']['lists']
+      expect(lists).to have(2).lists
+      list_title = lists[0]['title']
+      expect(list_title).to eq(list_one.title)
+    end
+
+    it 'should be able to query a single list belonging to the current user' do
+      post '/graphql', params: list_request_body.to_json, headers: auth_headers
+      response_body = JSON.parse(response.body)
+      list = response_body['data']['list']
+      expect(list['title']).to eq(list_one.title)
+    end
+
+    it 'should be able to create a new list for the current user' do
+      post '/graphql', params: create_list_request_body.to_json,
+                       headers: auth_headers
+      response_body = JSON.parse(response.body)
+      new_list_title = response_body['data']['createList']['title']
+      expected_new_list_title = create_list_request_body[:variables][:title]
+      expect(new_list_title).to eq(expected_new_list_title)
+      list = List.last
+      expect(list.title).to eq(expected_new_list_title)
+      expect(list.user).to eq(user)
+    end
+
+    it 'should not be able to edit another user’s list' do
+      updated_edit_list_request_body = edit_list_request_body.clone
+      updated_edit_list_request_body[:variables][:id] = list_three.id
+      post '/graphql', params: updated_edit_list_request_body.to_json,
+                       headers: auth_headers
+      expect_unauthorized_error response
+    end
+
+    it 'should be able to edit an existing list belonging to the current'\
+       ' user' do
+      post '/graphql', params: edit_list_request_body.to_json,
+                       headers: auth_headers
+      response_body = JSON.parse(response.body)
+      edited_list_title = response_body['data']['editList']['title']
+      variables = edit_list_request_body[:variables]
+      expected_edited_list_title = variables[:listInput][:title]
+      expect(edited_list_title).to eq(expected_edited_list_title)
+      list_one.reload
+      expect(list_one.title).to eq(expected_edited_list_title)
+    end
+
+    it 'should not be able to delete another user’s list' do
+      updated_delete_list_request_body = delete_list_request_body.clone
+      updated_delete_list_request_body[:variables][:id] = list_three.id
+      post '/graphql', params: updated_delete_list_request_body.to_json,
+                       headers: auth_headers
+      expect_unauthorized_error response
+    end
+
+    it 'should be able to delete an existing list belonging to the current'\
+       ' user' do
+      post '/graphql', params: delete_list_request_body.to_json,
+                       headers: auth_headers
+      response_body = JSON.parse(response.body)
+      deleted_list_title = response_body['data']['deleteList']['title']
+      expect(deleted_list_title).to eq(list_one.title)
+      deleted_list = user.lists.find_by_id(list_one.id)
+      expect(deleted_list).to be_nil
+    end
   end
 end

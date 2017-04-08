@@ -1,14 +1,17 @@
+require_relative '../../helpers/graphql_helpers'
+
 Types::MutationType = GraphQL::ObjectType.define do
   name 'Mutation'
 
   field :createList, Types::ListType do
     description 'Create a new list'
     argument :title, !types.String
-    resolve lambda { |_, args, _|
-      List.create! do |list|
-        # TODO: this will eventually be the current_user:
-        list.user_id = 1
-        list.title = args[:title]
+    resolve lambda { |_, args, ctx|
+      owned_resource(ctx) do |current_user|
+        List.create! do |list|
+          list.user = current_user
+          list.title = args[:title]
+        end
       end
     }
   end
@@ -29,10 +32,16 @@ Types::MutationType = GraphQL::ObjectType.define do
     description 'Edit an existing list'
     argument :id, !types.ID
     argument :listInput, !Types::ListInputType
-    resolve lambda { |_, args, _|
-      list = List.find(args[:id])
-      list.update! args[:listInput].to_h
-      list
+    resolve lambda { |_, args, ctx|
+      owned_resource(ctx) do |current_user|
+        exclusive_resource(
+          current_user: current_user,
+          resource_symbol: :lists,
+          resource_id: args[:id],
+          action_symbol: :update,
+          input_object: args[:listInput].to_h
+        )
+      end
     }
   end
 
@@ -50,9 +59,15 @@ Types::MutationType = GraphQL::ObjectType.define do
   field :deleteList, Types::ListType do
     description 'Delete an existing list'
     argument :id, !types.ID
-    resolve lambda { |_, args, _|
-      list = List.find(args[:id])
-      list.destroy!
+    resolve lambda { |_, args, ctx|
+      owned_resource(ctx) do |current_user|
+        exclusive_resource(
+          current_user: current_user,
+          resource_symbol: :lists,
+          resource_id: args[:id],
+          action_symbol: :destroy!
+        )
+      end
     }
   end
 

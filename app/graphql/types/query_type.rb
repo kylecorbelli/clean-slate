@@ -1,15 +1,23 @@
+require_relative '../../helpers/graphql_helpers'
+
 Types::QueryType = GraphQL::ObjectType.define do
   name 'Query'
 
   field :lists, types[Types::ListType] do
     description 'All the lists'
-    resolve ->(_, _, _) { List.all }
+    resolve lambda { |_, _, ctx|
+      owned_resource(ctx) { |current_user| current_user.lists.all }
+    }
   end
 
   field :list, Types::ListType do
     description 'An individual list'
     argument :id, !types.ID
-    resolve ->(_, args, _) { List.find(args[:id]) }
+    resolve lambda { |_, args, ctx|
+      owned_resource(ctx) do |current_user|
+        current_user.lists.find(args[:id])
+      end
+    }
   end
 
   field :task, Types::TaskType do
