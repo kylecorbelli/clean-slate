@@ -5,6 +5,12 @@ require 'codecov'
 SimpleCov.start
 SimpleCov.formatter = SimpleCov::Formatter::Codecov
 
+def expect_unauthorized_error(response)
+  response_body = JSON.parse(response.body)
+  error_message = response_body['errors'][0]['message']
+  expect(error_message).to eq('Authorized users only.')
+end
+
 shared_context 'mocked data' do
   let! :headers do
     {
@@ -81,5 +87,24 @@ shared_context 'mocked data' do
       t.list = list_three
       t.description = 'Somebody else’s task'
     end
+  end
+
+  let! :task_four do
+    Task.create! do |t|
+      t.list = list_two
+      t.description = 'A specific task for a specific list'
+    end
+  end
+
+  def send_unauthorized_request(request_body)
+    post '/graphql', params: request_body.to_json, headers: headers
+  end
+
+  def send_authorized_request(request_body)
+    post '/graphql', params: request_body.to_json, headers: auth_headers
+  end
+
+  def parse_json(response)
+    JSON.parse(response.body)
   end
 end
