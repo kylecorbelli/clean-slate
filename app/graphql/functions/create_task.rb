@@ -4,7 +4,7 @@ class CreateTask < GraphQL::Function
   attr_reader :type
 
   argument :listId, !GraphQL::ID_TYPE
-  argument :description, !GraphQL::STRING_TYPE
+  argument :name, !GraphQL::STRING_TYPE
 
   def initialize
     @type = Types::TaskType
@@ -15,7 +15,7 @@ class CreateTask < GraphQL::Function
       list = current_user.lists.find_by_id(args[:listId])
       return unauthorized_error if list.nil?
       list.tasks.create! do |task|
-        task.description = args[:description]
+        task.name = args[:name]
       end
     end
   end

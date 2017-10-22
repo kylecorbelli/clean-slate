@@ -7,7 +7,7 @@ describe 'Task API' do
     query = %(
       query {
         tasks {
-          description
+          name
         }
       }
     )
@@ -22,7 +22,7 @@ describe 'Task API' do
       query TasksFromList($listId: ID!) {
         list(id: $listId) {
           tasks {
-            description
+            name
           }
         }
       }
@@ -39,7 +39,7 @@ describe 'Task API' do
     query = %(
       query Task($id: ID!) {
         task(id: $id) {
-          description
+          name
         }
       }
     )
@@ -53,9 +53,9 @@ describe 'Task API' do
 
   let :create_task_request_body do
     query = %(
-      mutation CreateTask($listId: ID!, $description: String!) {
-        createTask(listId: $listId, description: $description) {
-          description
+      mutation CreateTask($listId: ID!, $name: String!) {
+        createTask(listId: $listId, name: $name) {
+          name
           isDone
         }
       }
@@ -64,7 +64,7 @@ describe 'Task API' do
       query: query,
       variables: {
         listId: list_two.id,
-        description: 'This is a neat new task'
+        name: 'This is a neat new task'
       }
     }
   end
@@ -73,7 +73,7 @@ describe 'Task API' do
     query = %(
       mutation UpdateTask($id: ID!, $taskInput: TaskInput!) {
         updateTask(id: $id, taskInput: $taskInput) {
-          description
+          name
           isDone
         }
       }
@@ -83,7 +83,7 @@ describe 'Task API' do
       variables: {
         id: task_one.id,
         taskInput: {
-          description: 'This ought to be a new description',
+          name: 'This ought to be a new name',
           isDone: true
         }
       }
@@ -94,7 +94,7 @@ describe 'Task API' do
     query = %(
       mutation DeleteTask($id: ID!) {
         deleteTask(id: $id) {
-          description
+          name
         }
       }
     )
@@ -139,8 +139,8 @@ describe 'Task API' do
       response_body = parse_json(response)
       tasks = response_body['data']['tasks']
       expect(tasks).to have(3).tasks
-      task_description = tasks[0]['description']
-      expect(task_description).to eq(task_one.description)
+      task_name = tasks[0]['name']
+      expect(task_name).to eq(task_one.name)
     end
 
     it 'should be able to query all the tasks from a given list' do
@@ -161,7 +161,7 @@ describe 'Task API' do
       send_authorized_request(task_request_body)
       response_body = parse_json(response)
       task = response_body['data']['task']
-      expect(task['description']).to eq(task_one.description)
+      expect(task['name']).to eq(task_one.name)
     end
 
     it 'should not allow creation of tasks on another user’s list' do
@@ -176,10 +176,10 @@ describe 'Task API' do
       send_authorized_request(create_task_request_body)
       response_body = parse_json(response)
       created_task = response_body['data']['createTask']
-      expected_description = create_task_request_body[:variables][:description]
-      expect(created_task['description']).to eq(expected_description)
+      expected_name = create_task_request_body[:variables][:name]
+      expect(created_task['name']).to eq(expected_name)
       expect(created_task['isDone']).to eq(false)
-      expect(Task.last.description).to eq(expected_description)
+      expect(Task.last.name).to eq(expected_name)
     end
 
     it 'should allow editing of a task belonging to the current user' do
@@ -187,10 +187,10 @@ describe 'Task API' do
       response_body = parse_json(response)
       task_input = update_task_request_body[:variables][:taskInput]
       task_from_response = response_body['data']['updateTask']
-      expect(task_from_response['description']).to eq(task_input[:description])
+      expect(task_from_response['name']).to eq(task_input[:name])
       expect(task_from_response['isDone']).to eq(task_input[:isDone])
       task = Task.find(update_task_request_body[:variables][:id])
-      expect(task.description).to eq(task_input[:description])
+      expect(task.name).to eq(task_input[:name])
       expect(task.is_done).to eq(task_input[:isDone])
     end
 
@@ -205,7 +205,7 @@ describe 'Task API' do
       send_authorized_request(delete_task_request_body)
       response_body = parse_json(response)
       task_from_response = response_body['data']['deleteTask']
-      expect(task_from_response['description']).to eq(task_one.description)
+      expect(task_from_response['name']).to eq(task_one.name)
       deleted_task = Task.find_by_id(task_one.id)
       expect(deleted_task).to be_nil
     end

@@ -71,28 +71,28 @@ shared_context 'mocked data' do
   let! :task_one do
     Task.create! do |t|
       t.list = list_one
-      t.description = 'List API specs'
+      t.name = 'List API specs'
     end
   end
 
   let! :task_two do
     Task.create! do |t|
       t.list = list_one
-      t.description = 'Task API specs'
+      t.name = 'Task API specs'
     end
   end
 
   let! :task_three do
     Task.create! do |t|
       t.list = list_three
-      t.description = 'Somebody else’s task'
+      t.name = 'Somebody else’s task'
     end
   end
 
   let! :task_four do
     Task.create! do |t|
       t.list = list_two
-      t.description = 'A specific task for a specific list'
+      t.name = 'A specific task for a specific list'
     end
   end
 
