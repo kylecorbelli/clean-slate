@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170401215454) do
+ActiveRecord::Schema.define(version: 20171021234639) do
 
   create_table "lists", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "title"
@@ -21,11 +21,12 @@ ActiveRecord::Schema.define(version: 20170401215454) do
   end
 
   create_table "tasks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "description"
-    t.boolean  "is_done",     default: false
+    t.string   "name"
+    t.boolean  "is_done",                   default: false
     t.integer  "list_id"
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.text     "description", limit: 65535
     t.index ["list_id"], name: "index_tasks_on_list_id", using: :btree
   end
 

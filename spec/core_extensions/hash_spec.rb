@@ -6,7 +6,7 @@ describe Hash do
     # both should be underscored:
     {
       theTask: {
-        description: 'underscore all keys',
+        name: 'underscore all keys',
         'isDone' => false
       }
     }
@@ -15,7 +15,7 @@ describe Hash do
   let :underscored_hash do
     {
       the_task: {
-        description: 'underscore all keys',
+        name: 'underscore all keys',
         'is_done' => false
       }
     }
