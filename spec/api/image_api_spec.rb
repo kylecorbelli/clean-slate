@@ -97,7 +97,7 @@ describe 'Image API' do
     it 'deletes an image' do
       send_authorized_request(delete_image_request_body)
       response_body = parse_json(response)
-      image = response_body['data']['deleteImage']      
+      image = response_body['data']['deleteImage']
       expected_url = image_two.url
       expect(image['url']).to eq(expected_url)
       deleted_image = Image.find_by_id(image_two.id)
