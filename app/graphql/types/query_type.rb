@@ -9,4 +9,6 @@ Types::QueryType = GraphQL::ObjectType.define do
   field :list, function: GetList.new
   field :tasks, function: GetTasks.new
   field :task, function: GetTask.new
+  field :images, function: GetImages.new
+  field :image, function: GetImage.new
 end

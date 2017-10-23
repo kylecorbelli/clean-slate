@@ -96,6 +96,20 @@ shared_context 'mocked data' do
     end
   end
 
+  let! :image_one do
+    Image.create! do |i|
+      i.task = task_one
+      i.url = 'http://someurl.com'
+    end
+  end
+
+  let! :image_two do
+    Image.create! do |i|
+      i.task = task_one
+      i.url = 'http://someotherurl.com'
+    end
+  end
+
   def send_unauthorized_request(request_body)
     post '/graphql', params: request_body.to_json, headers: headers
   end
