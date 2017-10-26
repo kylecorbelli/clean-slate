@@ -200,10 +200,8 @@ describe 'List API' do
 
     it 'deletes all tasks on a particular list' do
       send_authorized_request(delete_all_tasks_from_list_request_body)
-      response_body = parse_json(response)
-      list = List.find_by_id(list_one.id)
-      expect(list.tasks.count).to eq(0)
-      expect(list.images.count).to eq(0)
+      expect(list_one.tasks.count).to eq(0)
+      expect(list_one.images.count).to eq(0)
     end
   end
 end
