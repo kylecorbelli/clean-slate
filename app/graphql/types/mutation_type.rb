@@ -13,4 +13,5 @@ Types::MutationType = GraphQL::ObjectType.define do
   field :deleteImage, function: DeleteImage.new
   field :deleteList, function: DeleteList.new
   field :deleteTask, function: DeleteTask.new
+  field :deleteAllTasksFromList, function: DeleteAllTasksFromList.new
 end
