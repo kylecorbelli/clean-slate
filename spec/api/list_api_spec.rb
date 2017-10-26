@@ -84,6 +84,22 @@ describe 'List API' do
     }
   end
 
+  let :delete_all_tasks_from_list_request_body do
+    query = %(
+      mutation DeleteAllTasksFromList($list_id: ID!) {
+        deleteAllTasksFromList(listId: $list_id) {
+          id
+        }
+      }
+    )
+    {
+      query: query,
+      variables: {
+        list_id: list_one.id
+      }
+    }
+  end
+
   context 'when a user is not logged in' do
     it 'should not allowing querying of lists' do
       send_unauthorized_request(lists_request_body)
@@ -180,6 +196,14 @@ describe 'List API' do
       expect(deleted_list_title).to eq(list_one.title)
       deleted_list = user.lists.find_by_id(list_one.id)
       expect(deleted_list).to be_nil
+    end
+
+    it 'deletes all tasks on a particular list' do
+      send_authorized_request(delete_all_tasks_from_list_request_body)
+      response_body = parse_json(response)
+      list = List.find_by_id(list_one.id)
+      expect(list.tasks.count).to eq(0)
+      expect(list.images.count).to eq(0)
     end
   end
 end
